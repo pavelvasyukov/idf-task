@@ -32,7 +32,7 @@ def fetch_data(url, max_retries=5):
                     return None
 
             elif response.status_code in (302, 429):
-                wait_time = max(int(response.headers.get("Retry-After"),2**attempt))
+                wait_time = max(int(response.headers.get("Retry-After"), 2**attempt))
                 logging.warning(
                     "Received %s, retrying in %s sec.", response.status_code, wait_time
                 )
@@ -75,15 +75,15 @@ def save_to_clickhouse(data):
         ) as client:
             client.command(
                 """
-                CREATE TABLE IF NOT EXISTS RAW_TABLE (
+                CREATE TABLE IF NOT EXISTS people_in_space_raw (
                     json_data String,
                     _inserted_at DateTime DEFAULT now()
-                ) ENGINE = MergeTree()
-                ORDER BY _inserted_at;
+                ) ENGINE = ReplacingMergeTree(_inserted_at)
+                ORDER BY json_data;
                 """
             )
-            client.insert("RAW_TABLE", [(data, datetime.now())])
-            client.command("OPTIMIZE TABLE RAW_TABLE DEDUPLICATE;")
+            client.insert("people_in_space_raw", [(data, datetime.now())])
+            client.command("OPTIMIZE TABLE people_in_space_raw DEDUPLICATE;")
             logging.info("Data successfully inserted into ClickHouse")
     except Exception as e:
         logging.error("Error while working with ClickHouse: %s", e)
