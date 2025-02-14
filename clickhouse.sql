@@ -6,7 +6,6 @@ CREATE TABLE IF NOT EXISTS people_in_space_raw (
 ) ENGINE = ReplacingMergeTree (_inserted_at)
 ORDER BY json_data;
 
-OPTIMIZE TABLE people_in_space_raw DEDUPLICATE;
 
 CREATE TABLE IF NOT EXISTS people_in_space (
     craft String,
@@ -15,16 +14,6 @@ CREATE TABLE IF NOT EXISTS people_in_space (
 ) ENGINE = MergeTree ()
 ORDER BY (name, craft);
 
--- CREATE MATERIALIZED VIEW IF NOT EXISTS people_in_space_mv TO people_in_space AS
--- SELECT
---     JSONExtractString (json_data, 'craft') AS craft,
---     JSONExtractString (json_data, 'name') AS name,
---     _inserted_at
--- FROM people_in_space_raw;
-
--- DROP VIEW IF EXISTS people_in_space_mv;
-
--- TRUNCATE TABLE people_in_space;
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS people_in_space_mv TO people_in_space AS
 SELECT
@@ -41,4 +30,6 @@ FROM (
     );
 
 
-SELECT * FROM people_in_space;  
+SELECT * FROM people_in_space;
+
+SELECT * FROM people_in_space_aggregated;

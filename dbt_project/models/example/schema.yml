@@ -1,0 +1,21 @@
+
+version: 2
+
+sources:
+  - name: idftask  # Должно совпадать с именем схемы в БД
+    tables:
+      - name: people_in_space
+      
+models:
+  - name: people_in_space_aggregated
+    description: "Агрегированные данные о количестве астронавтов в каждом корабле"
+    columns:
+      - name: craft
+        description: "Название космического корабля"
+        tests:
+          - not_null
+      - name: astronaut_count
+        description: "Количество астронавтов на борту"
+        tests:
+          - not_null
+

@@ -1,0 +1,11 @@
+dbt_project:
+  target: dev
+  outputs:
+    dev:
+      type: clickhouse
+      host: localhost
+      port: 8123
+      schema: idftask
+      user: idftask
+      password: idftask
+
