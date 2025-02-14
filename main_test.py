@@ -1,9 +1,8 @@
 import json
-import time
 import pytest
 from unittest.mock import patch, MagicMock
-import requests
 from main import fetch_data, save_to_clickhouse
+from datetime import datetime
 
 @pytest.fixture
 def mock_get():
@@ -11,13 +10,16 @@ def mock_get():
     with patch("main.requests.get") as mock:
         yield mock
 
+
 @pytest.fixture
 def mock_clickhouse():
     """Fixture to mock ClickHouse client"""
     with patch("main.clickhouse_connect.get_client") as mock:
         yield mock
 
+
 # -------------------- TESTS FOR fetch_data --------------------
+
 
 def test_fetch_data_success(mock_get):
     """Test fetch_data when response is successful (HTTP 200)."""
@@ -68,17 +70,22 @@ def test_fetch_data_http_400_fail(mock_get):
     assert result is None
 
 
-# -------------------- TESTS FOR save_to_clickhouse --------------------
-
 def test_save_to_clickhouse_success(mock_clickhouse):
     """Test successful data insertion into ClickHouse."""
-    mock_instance = mock_clickhouse.return_value
-    mock_instance.insert.return_value = None
+    mock_client = mock_clickhouse.return_value.__enter__.return_value
+    mock_client.insert.return_value = None 
 
     save_to_clickhouse('{"data": "test"}')
 
     mock_clickhouse.assert_called_once()
-    mock_instance.insert.assert_called_once_with("RAW_TABLE", [('{"data": "test"}',)])
+    mock_client.insert.assert_called_once()
+
+    called_table, called_data = mock_client.insert.call_args[0]
+
+    assert called_table == "people_in_space_raw"
+    assert len(called_data) == 1
+    assert called_data[0][0] == '{"data": "test"}'
+    assert isinstance(called_data[0][1], datetime)
 
 
 def test_save_to_clickhouse_connection_fail(mock_clickhouse, caplog):

@@ -32,7 +32,7 @@ def fetch_data(url, max_retries=5):
                     return None
 
             elif response.status_code in (302, 429):
-                wait_time = max(int(response.headers.get("Retry-After"), 2**attempt))
+                wait_time = max(int(response.headers.get("Retry-After")), 2**attempt)
                 logging.warning(
                     "Received %s, retrying in %s sec.", response.status_code, wait_time
                 )

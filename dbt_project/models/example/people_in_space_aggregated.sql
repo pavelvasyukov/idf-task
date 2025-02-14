@@ -4,5 +4,5 @@
 SELECT 
     craft, 
     COUNT(name) AS astronaut_count 
-FROM {{ source('idftask', 'people_in_space') }}
+FROM {{ source('idftask', 'people') }}
 GROUP BY craft
