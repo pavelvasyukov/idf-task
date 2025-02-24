@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-while ! clickhouse-client -u idftask --password idftask --query "SELECT 1" &> /dev/null; do
+while ! clickhouse-client -u "$CLICKHOUSE_USER" --password "$CLICKHOUSE_PASSWORD" --query "SELECT 1" &> /dev/null; do
     sleep 1
 done
 
