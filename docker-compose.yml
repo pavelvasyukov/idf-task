@@ -1,14 +1,18 @@
 version: '3.8'
 
+
 services:
   clickhouse:
     image: yandex/clickhouse-server:latest
-    container_name: clickhouse
+    container_name: idf-task-clickhouse-1
     ports:
       - "8123:8123"  # HTTP API
       - "9000:9000"  # Native protocol
     volumes:
       - clickhouse_data:/var/lib/clickhouse
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+      - ./scripts:/init-sql-scripts
+      # - ./scripts:/docker-entrypoint-initdb.d
     environment:
       CLICKHOUSE_DB: idftask
       CLICKHOUSE_USER: idftask
